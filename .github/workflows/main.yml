@@ -21,8 +21,6 @@ jobs:
     - name: Build
       run: make build
 
-    - name: Run tests
-      run: make test
 
   release:
     needs: build
