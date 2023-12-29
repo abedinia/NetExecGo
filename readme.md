@@ -3,6 +3,13 @@
 ## Overview
 NetExecGo is a Go-based command-line tool designed for executing commands through a specified socks proxy server. This tool is particularly useful for scenarios where network commands need to be routed through a proxy for security, privacy, or access reasons. It provides real-time feedback and statistics on the execution of the command, including CPU and memory usage.
 
+![Build Status](https://github.com/abedinia/NetExecGo/actions/workflows/main.yml/badge.svg)
+[![codecov](https://codecov.io/gh/abedinia/NetExecGo/branch/main/graph/badge.svg)](https://codecov.io/gh/abedinia/NetExecGo)
+[![Dependencies Status](https://api.dependabot.com/badges/status?host=github&repo=abedinia/NetExecGo)](https://dependabot.com)
+[![License](https://img.shields.io/github/license/abedinia/NetExecGo)](https://github.com/abedinia/NetExecGo/blob/main/LICENSE)
+
+
+
 ## Features
 - Command execution through a specified proxy server.
 - Real-time output display for both standard output and standard error.
