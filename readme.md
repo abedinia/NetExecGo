@@ -44,3 +44,26 @@ This example will execute curl ifconfig.me using the proxy at 127.0.0.1:2080.
 
 ## Contact
 For any questions or feedback regarding NetExecGo, please open an issue in the project's GitHub repository.
+
+
+## Download and use
+
+To install, download the latest release from the releases page. Move the executable file (netexecgo) to your bin directory and add it to your profile.
+
+```
+sudo chmod +x ./netexecgo
+```
+
+On macOS, you'll need to allow the security check.
+
+```
+sudo spctl --add --label "netexecgo" --type execute netexecgo
+```
+
+Once installed, you can run netexecgo with the following command:
+
+```
+netexecgo localhost:2080 curl ifconfig.me
+```
+
+This will execute the curl command to fetch the IP address on the specified port.
