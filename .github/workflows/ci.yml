@@ -4,16 +4,37 @@ on:
   push:
     tags:
     - 'v*'
-    branches:
-    - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [linux, darwin, windows]
-        go-version: ['1.21']
+        include:
+        - os: linux
+          dist: ubuntu
+          goos: linux
+          goarch: amd64
+        - os: linux
+          dist: debian
+          goos: linux
+          goarch: amd64
+        - os: linux
+          dist: fedora
+          goos: linux
+          goarch: amd64
+        - os: linux
+          dist: suse
+          goos: linux
+          goarch: amd64
+        - os: macos
+          dist: macos-intel
+          goos: darwin
+          goarch: amd64
+        - os: macos
+          dist: macos-silicon
+          goos: darwin
+          goarch: arm64
     steps:
     - name: Check out code
       uses: actions/checkout@v2
@@ -21,17 +42,17 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ matrix.go-version }}
+        go-version: '1.21'
 
     - name: Build
       run: |
-        GOOS=${{ matrix.os }} GOARCH=amd64 go build -o netexecgo-${{ matrix.os }}-${{ matrix.go-version }} main.go
+        GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o netexecgo-${{ matrix.os }}-${{ matrix.goarch }} main.go
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: netexecgo-${{ matrix.os }}-${{ matrix.go-version }}
-        path: netexecgo-${{ matrix.os }}-${{ matrix.go-version }}
+        name: netexecgo-${{ matrix.os }}-${{ matrix.goarch }}
+        path: netexecgo-${{ matrix.os }}-${{ matrix.goarch }}
 
   release:
     needs: build
@@ -39,13 +60,17 @@ jobs:
     steps:
     - name: Download Artifacts
       uses: actions/download-artifact@v2
+      with:
+        path: ./artifacts
+
+    - name: Prepare Release Files
+      run: |
+        mkdir release_files
+        find ./artifacts -type f -exec mv {} release_files/ \;
 
     - name: Create Release
       uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        files: |
-          netexecgo-linux-${{ matrix.go-version }}
-          netexecgo-darwin-${{ matrix.go-version }}
-          netexecgo-windows-${{ matrix.go-version }}
+        files: release_files/*
