@@ -12,4 +12,7 @@ clean:
 	@go clean
 	@rm -f ${BINARY_NAME}
 
-.PHONY: all build run clean
+test:
+	@go test -cover
+
+.PHONY: all build run clean test
