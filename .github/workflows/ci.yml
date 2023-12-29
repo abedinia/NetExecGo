@@ -12,29 +12,17 @@ jobs:
       matrix:
         include:
         - os: linux
-          dist: ubuntu
           goos: linux
           goarch: amd64
-        - os: linux
-          dist: debian
-          goos: linux
-          goarch: amd64
-        - os: linux
-          dist: fedora
-          goos: linux
-          goarch: amd64
-        - os: linux
-          dist: suse
-          goos: linux
-          goarch: amd64
+          extension: ""
         - os: macos
-          dist: macos-intel
           goos: darwin
           goarch: amd64
-        - os: macos
-          dist: macos-silicon
-          goos: darwin
-          goarch: arm64
+          extension: ""
+        - os: windows
+          goos: windows
+          goarch: amd64
+          extension: ".exe"
     steps:
     - name: Check out code
       uses: actions/checkout@v2
@@ -46,13 +34,13 @@ jobs:
 
     - name: Build
       run: |
-        GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o netexecgo-${{ matrix.os }}-${{ matrix.goarch }} main.go
+        GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o netexecgo-${{ matrix.os }}-${{ matrix.goarch }}${{ matrix.extension }} main.go
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
       with:
         name: netexecgo-${{ matrix.os }}-${{ matrix.goarch }}
-        path: netexecgo-${{ matrix.os }}-${{ matrix.goarch }}
+        path: netexecgo-${{ matrix.os }}-${{ matrix.goarch }}${{ matrix.extension }}
 
   release:
     needs: build
