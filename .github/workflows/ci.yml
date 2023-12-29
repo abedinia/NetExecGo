@@ -10,7 +10,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        os: [linux, darwin, windows]
+        go-version: ['1.21']
     steps:
     - name: Check out code
       uses: actions/checkout@v2
@@ -18,33 +21,31 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: '^1.21'
+        go-version: ${{ matrix.go-version }}
 
     - name: Build
       run: |
-        go build -o netexecgo main.go
+        GOOS=${{ matrix.os }} GOARCH=amd64 go build -o netexecgo-${{ matrix.os }}-${{ matrix.go-version }} main.go
 
-    - name: Find Executable
-      id: find_executable
-      run: echo "::set-output name=exe_path::$(find . -name 'netexecgo' -type f)"
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: netexecgo-${{ matrix.os }}-${{ matrix.go-version }}
+        path: netexecgo-${{ matrix.os }}-${{ matrix.go-version }}
 
   release:
     needs: build
     runs-on: ubuntu-latest
-
     steps:
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: '^1.21'
-
-    - name: Check out code
-      uses: actions/checkout@v2
+    - name: Download Artifacts
+      uses: actions/download-artifact@v2
 
     - name: Create Release
-      id: create_release
       uses: softprops/action-gh-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        files: ${{ steps.find_executable.outputs.exe_path }}
+        files: |
+          netexecgo-linux-${{ matrix.go-version }}
+          netexecgo-darwin-${{ matrix.go-version }}
+          netexecgo-windows-${{ matrix.go-version }}
