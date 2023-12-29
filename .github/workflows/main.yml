@@ -2,10 +2,8 @@ name: Build and Release
 
 on:
   push:
-    branches:
-    - main
-
-# JOBS ------------
+    tags:
+    - '*'
 
 jobs:
   build:
@@ -21,7 +19,32 @@ jobs:
         go-version: '^1.21'
 
     - name: Build
-      run: make build
+      run: |
+        make build
+        # or if you have custom build commands:
+        # go build -o netexecgo
 
-    - name: Run tests
-      run: make test
+    - name: Find Executable
+      id: find_executable
+      run: echo "::set-output name=exe_path::$(find . -name 'netexecgo' -type f)"
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '^1.21'
+
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        files: ${{ steps.find_executable.outputs.exe_path }}
