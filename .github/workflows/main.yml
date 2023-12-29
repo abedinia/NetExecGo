@@ -3,7 +3,7 @@ name: Build and Release
 on:
   push:
     tags:
-    - '*'
+    - '**'
 
 jobs:
   build:
@@ -19,11 +19,7 @@ jobs:
         go-version: '^1.21'
 
     - name: Build
-      run: |
-        make build
-        # or if you have custom build commands:
-        # go build -o netexecgo
-
+      run: go build -o 'netexecgo' main.go
     - name: Find Executable
       id: find_executable
       run: echo "::set-output name=exe_path::$(find . -name 'netexecgo' -type f)"
