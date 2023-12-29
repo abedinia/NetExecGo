@@ -5,7 +5,6 @@ NetExecGo is a Go-based command-line tool designed for executing commands throug
 
 ![Build Status](https://github.com/abedinia/NetExecGo/actions/workflows/ci.yml/badge.svg)
 [![codecov](https://codecov.io/gh/abedinia/NetExecGo/branch/main/graph/badge.svg)](https://codecov.io/gh/abedinia/NetExecGo)
-[![Dependencies Status](https://api.dependabot.com/badges/status?host=github&repo=abedinia/NetExecGo)](https://dependabot.com)
 [![License](https://img.shields.io/github/license/abedinia/NetExecGo)](https://github.com/abedinia/NetExecGo/blob/main/LICENSE)
 
 
