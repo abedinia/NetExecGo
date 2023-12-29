@@ -1,40 +1,50 @@
-name: CI
+name: Build and Release
 
 on:
-  pull_request:
   push:
+    tags:
+    - 'v*'
     branches:
     - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v3
+    - name: Check out code
+      uses: actions/checkout@v2
 
     - name: Set up Go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v2
       with:
-        go-version: 1.21
+        go-version: '^1.21'
 
-    - name: Install dependencies
-      run: go get -v -t ./...
+    - name: Build
+      run: |
+        go build -o netexecgo main.go
 
-    - name: Test with coverage
-      run: go test -cover
+    - name: Find Executable
+      id: find_executable
+      run: echo "::set-output name=exe_path::$(find . -name 'netexecgo' -type f)"
 
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up Go
+      uses: actions/setup-go@v2
       with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: coverage.txt
-        fail_ci_if_error: true
+        go-version: '^1.21'
 
-    - name: Build Docker image
-      run: docker build -t netexecgo:latest .
+    - name: Check out code
+      uses: actions/checkout@v2
 
-    - name: Push Docker image
-      uses: docker/build-push-action@v3
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        push: true
-        tags: netexecgo:latest
+        files: ${{ steps.find_executable.outputs.exe_path }}
