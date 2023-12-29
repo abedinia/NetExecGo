@@ -1,4 +1,4 @@
-BINARY_NAME=proxgo
+BINARY_NAME=netexecgo
 
 all: build
 
