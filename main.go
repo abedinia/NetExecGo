@@ -10,13 +10,11 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
-	"runtime"
 	"strings"
 	"syscall"
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/shirou/gopsutil/cpu"
 )
 
 type CommandExecuter interface {
@@ -145,12 +143,6 @@ func handleFatalError(message string, err error) {
 	}
 }
 
-func printExecutionStats(elapsedTime time.Duration, preCPU, postCPU float64, memoryUsage uint64) {
-	color.New(color.FgHiBlack).Printf("Execution Time: %s\n", elapsedTime)
-	color.New(color.FgHiBlack).Printf("Pre-Execution CPU Usage: %.2f%%\n", preCPU)
-	color.New(color.FgHiBlack).Printf("Post-Execution CPU Usage: %.2f%%\n", postCPU)
-	color.New(color.FgHiBlack).Printf("Memory Usage: %d bytes\n", memoryUsage)
-}
 
 func main() {
 	if len(os.Args) < 3 {
@@ -158,22 +150,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	preCPU, err := cpu.Percent(0, false)
-	handleFatalError("Failed to get CPU usage", err)
-
-	startTime := time.Now()
-
 	executer := DefaultExecuter{}
-	err = executer.ExecuteCommand(os.Args[1], os.Args[2], os.Args[3:])
-	handleFatalError("Command execution failed", err)
-
-	elapsedTime := time.Since(startTime)
-
-	postCPU, err := cpu.Percent(0, false)
-	handleFatalError("Failed to get CPU usage", err)
-
-	var m runtime.MemStats
-	runtime.ReadMemStats(&m)
-
-	printExecutionStats(elapsedTime, preCPU[0], postCPU[0], m.Sys)
+	err := executer.ExecuteCommand(os.Args[1], os.Args[2], os.Args[3:])
+	if err != nil {
+		fmt.Println(err)
+	}
 }
